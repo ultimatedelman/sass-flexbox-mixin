@@ -35,3 +35,5 @@ The mixin takes named arguments, so you can customize your layouts however you n
         @include flexchild($flexbasis: 200px); //fixed width
       }
     }
+
+Let this mixin do all the hard work of remembering which IE properties and values translate into which standards-based property and what legacy property maps to which new properties!
