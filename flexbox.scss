@@ -1,0 +1,94 @@
+@mixin flexcontainer($display: flex, $flexdirection: false, $flexwrap: false, $justifycontent: false, $alignitems: false, $aligncontent: false) {
+    /*  values:
+        $display: flex | inline-flex
+        $flexdirection: row(default) | row-reverse | column | column-reverse
+        $flexwrap: nowrap(default) | wrap | wrap-reverse
+        $justifycontent: flex-start(default) | flex-end | center | space-between | space-around
+        $alignitems: flex-start | flex-end | center | baseline | stretch (default)
+        $aligncontent: flex-start | flex-end | center | space-between | space-around | stretch (default)
+    */
+    .flexboxlegacy & {
+        @include display-box;            
+        @if $flexdirection { @include oldflexconvert(flex-direction, $flexdirection); }
+        @if $justifycontent { @include oldflexconvert(justifycontent, $justifycontent); }
+        @if $alignitems { @include oldflexconvert(align-items, $alignitems); }
+    }
+    .flexbox & {
+        @if $display == flex {
+            display: -ms-flexbox;
+            display: -moz-flex;
+            display: -webkit-flex;
+            display: flex;
+        }
+        @else {
+            display: -ms-inline-flexbox;
+            display: -moz-inline-flex;
+            display: -webkit-inline-flex;
+            display: inline-flex;
+        }
+        @if $flexdirection { @include flexprop(flex-direction, $flexdirection); }
+        @if $flexwrap { @include flexprop(flex-wrap, $flexwrap); }
+        @if $justifycontent { @include flexprop(justify-content, $justifycontent); }
+        @if $alignitems { @include flexprop(align-items, $alignitems); }
+        @if $aligncontent { @include flexprop(align-content, $aligncontent); }
+    }
+}
+
+@mixin flexchild($order: false, $flexgrow: 0, $flexshrink: 1, $flexbasis: auto, $alignself: false) {
+    .flexboxlegacy & {        
+        @include box-flex($flexgrow);
+        @if $order { @include box-ordinal-group($order + 1); } //legacy is 1-based
+    }
+    .flexbox & {
+        @if $order { @include flexprop(order, $order); }
+        @include flexprop(flex, ($flexgrow $flexshrink $flexbasis));
+        @if $alignself { @include flexprop(align-self, $alignself); }        
+    }
+}
+
+//translate for oldflex
+@mixin oldflexconvert($prop, $value) {
+    @if $prop == flex-direction {
+        $dir: normal;
+        $orient: horizontal;
+        @if $value == row-reverse { $dir: reverse; }
+        @if $value == column { $orient: vertical; }
+        @if $value == column-reverse {
+            $orient: vertical;
+            $dir: reverse;
+        }
+        @include box-direction($dir);
+        @include box-orient($orient);
+    }
+    @if $prop == justify-content or $prop == align-items {
+        $newval: $value;
+        @if $value == flex-start { $newval: start; }
+        @if $value == flex-end { $newval: end; }
+        @if $value == space-between { $newval: justify; }
+        @if $value == space-around { $newval: justify; }
+        
+        @if $prop == justify-content { @include box-pack($newval); }
+        @if $prop == align-items { @include box-align($newval); }
+    }
+}
+
+//translate for IE
+@function ieflexvalue($value) {
+    @if $value == flex-start { @return start; }    
+    @if $value == flex-end { @return end; }
+    @if $value == space-between { @return justify; }
+    @if $value == space-around { @return distribute; }
+    @if $value == justify-content { @return flex-pack; }
+    @if $value == align-items { @return flex-align; }
+    @if $value == align-content { @return flex-line-pack; }
+    @if $value == align-self { @return flex-item-align; }
+    @if $value == order { @return flex-order; }
+    @return $value;
+}
+
+@mixin flexprop($prop, $value) {
+    -webkit-#{$prop}: $value;
+    -moz-#{$prop}: $value;
+    -ms-#{ieflexvalue($prop)}: ieflexvalue($value);
+    #{$prop}: $value;
+}
