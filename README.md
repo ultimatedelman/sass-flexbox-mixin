@@ -32,7 +32,7 @@ The mixin takes named arguments, so you can customize your layouts however you n
     .child {
       @include flexchild;
       &:nth-child(1) {
-        @include flexchild($flexbasis: 200px); //fixed width
+        @include flexprop(flex-basis, 200px); //helper mixin for single properties
       }
     }
 
