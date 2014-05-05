@@ -7,7 +7,7 @@
         $alignitems: flex-start | flex-end | center | baseline | stretch (default)
         $aligncontent: flex-start | flex-end | center | space-between | space-around | stretch (default)
     */
-    .flexboxlegacy & {
+    .flexboxlegacy.no-flexbox & {
         @include display-box;            
         @if $flexdirection { @include oldflexconvert(flex-direction, $flexdirection); }
         @if $justifycontent { @include oldflexconvert(justifycontent, $justifycontent); }
@@ -35,9 +35,11 @@
 }
 
 @mixin flexchild($order: false, $flexgrow: 0, $flexshrink: 1, $flexbasis: auto, $alignself: false) {
-    .flexboxlegacy & {        
+    .flexboxlegacy.no-flexbox & {        
         @include box-flex($flexgrow);
         @if $order { @include box-ordinal-group($order + 1); } //legacy is 1-based
+        max-width: $flexbasis;
+        @include display-box;
     }
     .flexbox & {
         @if $order { @include flexprop(order, $order); }
