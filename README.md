@@ -20,8 +20,9 @@ you can turn this into a flexbox layout using this mixin like so:
     .container {
       @include flexcontainer;
     }
+    //direct children become flex items by default, use this only if values are different than defaults
     .child {
-      @include flexchild;
+      @include flexchild(...);
     }
     
 The mixin takes named arguments, so you can customize your layouts however you need:
