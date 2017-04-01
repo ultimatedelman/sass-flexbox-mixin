@@ -1,14 +1,37 @@
+//  The MIT License (MIT)
+//
+//  Copyright (c) 2013 Jason Edelman
+//  Copyright (c) 2017 Peter Putzer
+//
+//  Permission is hereby granted, free of charge, to any person obtaining a copy of
+//  this software and associated documentation files (the "Software"), to deal in
+//  the Software without restriction, including without limitation the rights to
+//  use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+//  the Software, and to permit persons to whom the Software is furnished to do so,
+//  subject to the following conditions:
+//
+//  The above copyright notice and this permission notice shall be included in all
+//  copies or substantial portions of the Software.
+//
+//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+//  FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+//  COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+//  IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+//  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+@import 'compass/css3/flexbox';
+
 @mixin flexcontainer($display: flex, $flexdirection: false, $flexwrap: false, $justifycontent: false, $alignitems: false, $aligncontent: false) {
-    /*  values:
-        $display: flex | inline-flex
-        $flexdirection: row(default) | row-reverse | column | column-reverse
-        $flexwrap: nowrap(default) | wrap | wrap-reverse
-        $justifycontent: flex-start(default) | flex-end | center | space-between | space-around
-        $alignitems: flex-start | flex-end | center | baseline | stretch (default)
-        $aligncontent: flex-start | flex-end | center | space-between | space-around | stretch (default)
-    */
+    //  values:
+    //    $display: flex | inline-flex
+    //    $flexdirection: row(default) | row-reverse | column | column-reverse
+    //    $flexwrap: nowrap(default) | wrap | wrap-reverse
+    //    $justifycontent: flex-start(default) | flex-end | center | space-between | space-around
+    //    $alignitems: flex-start | flex-end | center | baseline | stretch (default)
+    //    $aligncontent: flex-start | flex-end | center | space-between | space-around | stretch (default)
     .flexboxlegacy.no-flexbox & {
-        @include display-box;            
+        @include flexbox((display: box), $version: 1);
         @if $flexdirection { @include oldflexconvert(flex-direction, $flexdirection); }
         @if $justifycontent { @include oldflexconvert(justifycontent, $justifycontent); }
         @if $alignitems { @include oldflexconvert(align-items, $alignitems); }
@@ -35,16 +58,15 @@
 }
 
 @mixin flexchild($order: false, $flexgrow: 0, $flexshrink: 1, $flexbasis: auto, $alignself: false) {
-    .flexboxlegacy.no-flexbox & {        
-        @include box-flex($flexgrow);
-        @if $order { @include box-ordinal-group($order + 1); } //legacy is 1-based
+    .flexboxlegacy.no-flexbox & {
+        @include flexbox((box-flex: $flexgrow, display: box), $version: 1);
+        @if $order { @include flexbox((box-ordinal-group: $order + 1), $version: 1); } //legacy is 1-based
         max-width: $flexbasis;
-        @include display-box;
     }
     .flexbox & {
         @if $order { @include flexprop(order, $order); }
         @include flexprop(flex, ($flexgrow $flexshrink $flexbasis));
-        @if $alignself { @include flexprop(align-self, $alignself); }        
+        @if $alignself { @include flexprop(align-self, $alignself); }
     }
 }
 
@@ -59,8 +81,8 @@
             $orient: vertical;
             $dir: reverse;
         }
-        @include box-direction($dir);
-        @include box-orient($orient);
+        @include flexbox((box-direction: $dir), $version: 1);
+        @include flexbox((box-orient: $orient), $version: 1);
     }
     @if $prop == justify-content or $prop == align-items {
         $newval: $value;
@@ -68,15 +90,14 @@
         @if $value == flex-end { $newval: end; }
         @if $value == space-between { $newval: justify; }
         @if $value == space-around { $newval: justify; }
-        
-        @if $prop == justify-content { @include box-pack($newval); }
-        @if $prop == align-items { @include box-align($newval); }
+        @if $prop == justify-content { @include flexbox((box-pack: $newval), $version: 1); }
+        @if $prop == align-items { @include flexbox((box-align: $newval), $version: 1); }
     }
 }
 
 //translate for IE
 @function ieflexvalue($value) {
-    @if $value == flex-start { @return start; }    
+    @if $value == flex-start { @return start; }
     @if $value == flex-end { @return end; }
     @if $value == space-between { @return justify; }
     @if $value == space-around { @return distribute; }
@@ -87,7 +108,6 @@
     @if $value == order { @return flex-order; }
     @return $value;
 }
-
 @mixin flexprop($prop, $value) {
     -webkit-#{$prop}: $value;
     -moz-#{$prop}: $value;
